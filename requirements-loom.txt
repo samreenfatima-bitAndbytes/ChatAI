@@ -1,0 +1,23 @@
+# Lean deps for local Loom UI (auth, dashboard, admin, CRUD).
+# Full stack (chromadb / RAG chat) still uses requirements.txt.
+
+fastapi==0.115.13
+uvicorn[standard]==0.34.3
+jinja2==3.1.6
+python-multipart==0.0.20
+python-dotenv==1.1.1
+SQLAlchemy==2.0.41
+alembic==1.16.2
+passlib[bcrypt]==1.7.4
+bcrypt==4.3.0
+python-jose[cryptography]==3.5.0
+email-validator==2.2.0
+pydantic==2.11.7
+typer==0.16.0
+httpx==0.28.1
+requests==2.32.4
+PyPDF2==3.0.1
+openai==1.91.0
+ollama==0.5.1
+pymysql==1.1.1
+psycopg2-binary==2.9.10

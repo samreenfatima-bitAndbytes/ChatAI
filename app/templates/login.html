@@ -1,0 +1,61 @@
+{% extends "skeleton.html" %}
+{% block title %}Sign in{% endblock %}
+{% block footer %}{% endblock %}
+{% block content %}
+<section class="bnb-auth">
+  <div class="bnb-auth__card">
+    <img src="{{ url_for('static', path='brand-mark.png') }}" alt="" width="44" height="44">
+    <h1>Sign in</h1>
+    <p>Access your workspace, assistants, and documents.</p>
+    <form id="loginForm">
+      <div class="bnb-field">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" autocomplete="username" required placeholder="you@company.com">
+      </div>
+      <div class="bnb-field">
+        <label for="password">Password</label>
+        <div class="bnb-password">
+          <input type="password" id="password" name="password" autocomplete="current-password" required placeholder="••••••••">
+          <button type="button" class="bnb-password__toggle" aria-label="Show password"></button>
+        </div>
+      </div>
+      <button type="submit" class="bnb-btn bnb-btn--primary bnb-btn--block">Sign in</button>
+    </form>
+    <div class="bnb-auth__meta">
+      <a href="/forgot-password">Forgot password?</a>
+      <div class="mt-2">No account? <a href="/signup">Create one</a></div>
+    </div>
+    <div id="error" class="bnb-alert" hidden></div>
+  </div>
+</section>
+{% endblock %}
+{% block extrajs %}
+<script>
+document.getElementById('loginForm').onsubmit = async function (e) {
+  e.preventDefault();
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+  const err = document.getElementById('error');
+  err.hidden = true;
+  const res = await fetch('/api/v1/auth/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password })
+  });
+  if (res.ok) {
+    const data = await res.json();
+    const userRes = await fetch(`/api/v1/auth/me?token=${data.access_token}`);
+    if (userRes.ok) {
+      const user = await userRes.json();
+      window.location.href = user.is_admin ? '/admin' : '/dashboard';
+    } else {
+      err.textContent = 'Signed in, but we could not load your profile.';
+      err.hidden = false;
+    }
+  } else {
+    err.textContent = 'Invalid email or password.';
+    err.hidden = false;
+  }
+};
+</script>
+{% endblock %}

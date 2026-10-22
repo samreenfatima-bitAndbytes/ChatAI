@@ -1,0 +1,31 @@
+<footer class="bnb-footer">
+  <div class="bnb-wrap">
+    <div class="bnb-footer__grid">
+      <div>
+        <a href="{{ url_for('home') }}" class="bnb-brand">
+          <img src="{{ url_for('static', path='brand-mark.png') }}" alt="">
+          <span class="bnb-brand__name">BnB <span>ChatAI</span></span>
+        </a>
+        <p class="bnb-footer__copy">
+          Website assistants for real teams — configure once, embed on your site, keep documents and tenants separate.
+        </p>
+      </div>
+      <nav class="bnb-footer__links" aria-label="Footer">
+        <a href="{{ url_for('home') }}">Home</a>
+        {% if user_authenticated %}
+        <a href="{{ url_for('dashboard_page') }}">Workspace</a>
+        {% if user and user.is_admin %}
+        <a href="{{ url_for('admin_panel') }}">Admin</a>
+        {% endif %}
+        {% else %}
+        <a href="{{ url_for('login_page') }}">Sign in</a>
+        <a href="{{ url_for('signup_page') }}">Sign up</a>
+        {% endif %}
+        <a href="mailto:support@chatai.example">Contact</a>
+      </nav>
+    </div>
+    <div class="bnb-footer__bottom">
+      &copy; {{ year or 2026 }} Bit &amp; Bytes · ChatAI
+    </div>
+  </div>
+</footer>

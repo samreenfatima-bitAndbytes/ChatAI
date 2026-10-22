@@ -1,0 +1,287 @@
+{% extends "skeleton.html" %}
+{% block title %}Admin{% endblock %}
+{% block body_class %}bnb-body--app{% endblock %}
+{% block shell_nav %}{% endblock %}
+{% block footer %}{% endblock %}
+{% block content %}
+<style>
+  /* Critical admin modal styles — use theme tokens */
+  .bnb-modal-overlay {
+    position: fixed; inset: 0; z-index: 60;
+    display: flex; align-items: center; justify-content: center;
+    padding: 1.25rem; background: rgba(0,0,0,.55);
+  }
+  html[data-theme="light"] .bnb-modal-overlay { background: rgba(26,18,40,.35); }
+  .bnb-modal {
+    width: min(100%, 28rem); max-height: min(90vh, 40rem); overflow: auto;
+    padding: 1.5rem; border-radius: 14px;
+    border: 1px solid var(--bnb-line);
+    background: var(--bnb-surface); color: var(--bnb-text);
+    box-shadow: var(--bnb-shadow);
+  }
+  .bnb-modal__title { margin: 0 0 1rem; font-size: 1.15rem; font-weight: 700; }
+  .bnb-modal__form { display: flex; flex-direction: column; gap: .75rem; }
+  .bnb-modal__field,
+  .bnb-modal input,
+  .bnb-modal textarea,
+  .bnb-modal select {
+    width: 100%; min-height: 2.6rem; padding: .6rem .85rem; box-sizing: border-box;
+    background: var(--bnb-ink) !important; border: 1px solid var(--bnb-line) !important;
+    color: var(--bnb-text) !important; -webkit-text-fill-color: var(--bnb-text);
+    border-radius: 10px; font: inherit;
+  }
+  .bnb-modal__field::placeholder,
+  .bnb-modal input::placeholder,
+  .bnb-modal textarea::placeholder {
+    color: var(--bnb-placeholder) !important; -webkit-text-fill-color: var(--bnb-placeholder); opacity: 1;
+  }
+  .bnb-modal__actions { display: flex; flex-wrap: wrap; gap: .65rem; margin-top: .35rem; }
+  .bnb-modal .bnb-btn--primary,
+  .bnb-modal button[type="submit"] {
+    background: var(--bnb-grad) !important;
+    color: var(--bnb-on-primary) !important; -webkit-text-fill-color: var(--bnb-on-primary);
+    border: none !important; border-radius: 999px !important; font-weight: 650;
+    min-height: 2.75rem; padding: .55rem 1.15rem;
+  }
+  .bnb-modal .close-modal,
+  .bnb-modal .bnb-btn--ghost {
+    color: var(--bnb-text) !important; -webkit-text-fill-color: var(--bnb-text);
+    background: transparent !important; border: 1px solid var(--bnb-line) !important;
+    border-radius: 999px !important; min-height: 2.75rem; padding: .55rem 1.15rem; font-weight: 600;
+  }
+</style>
+
+<div class="bnb-admin bnb-admin-layout" id="admin-layout">
+  <div class="bnb-admin-side-backdrop" id="admin-side-backdrop" hidden></div>
+  <aside class="bnb-admin-side" id="admin-side" aria-label="Admin sections">
+    <a href="{{ url_for('home') }}" class="bnb-admin-side__brand" aria-label="BnB ChatAI home">
+      <img src="{{ url_for('static', path='brand-mark.png') }}" alt="">
+      <span class="bnb-admin-side__brand-text">
+        <span class="bnb-admin-side__name">BnB ChatAI</span>
+        <span class="bnb-admin-side__sub">Admin</span>
+      </span>
+    </a>
+
+    <nav class="bnb-admin-side__nav">
+      <button type="button" class="sidebar-btn is-active" data-tab="users">Users</button>
+      <button type="button" class="sidebar-btn" data-tab="chatbots">Assistants</button>
+      <button type="button" class="sidebar-btn" data-tab="suggestions">Suggestions</button>
+      <button type="button" class="sidebar-btn" data-tab="tenants">Businesses</button>
+      <button type="button" class="sidebar-btn" data-tab="documents">Documents</button>
+    </nav>
+
+    <div class="bnb-admin-side__foot">
+      <a href="{{ url_for('dashboard_page') }}" class="bnb-admin-side__link">Workspace</a>
+      <a href="{{ url_for('home') }}" class="bnb-admin-side__link">Home</a>
+    </div>
+  </aside>
+
+  <div class="bnb-admin-stage">
+    <header class="bnb-admin-topbar">
+      <div class="bnb-admin-topbar__left">
+        <button type="button" class="bnb-btn bnb-btn--ghost bnb-admin-menu-btn" id="admin-side-toggle" aria-label="Open admin menu" aria-expanded="false" aria-controls="admin-side">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <line x1="4" y1="7" x2="20" y2="7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <line x1="4" y1="12" x2="20" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <line x1="4" y1="17" x2="20" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+        <span class="bnb-admin-main__label bnb-admin-topbar__signed">Signed in as</span>
+        <span class="gradient-text bnb-admin-topbar__name">{{ user.full_name or user.email }}</span>
+        <span class="bnb-admin-badge">Admin</span>
+      </div>
+      <div class="bnb-admin-topbar__right">
+        <button type="button" class="bnb-btn bnb-btn--ghost bnb-theme-toggle" aria-label="Switch to light mode" title="Light mode" aria-pressed="false">
+          <svg class="bnb-theme-icon--sun" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 7a5 5 0 100 10 5 5 0 000-10zm0-5a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm0 17a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM3 11a1 1 0 100 2h1a1 1 0 100-2H3zm17 0a1 1 0 100 2h1a1 1 0 100-2h-1zM5.64 5.64a1 1 0 011.41 0l.71.71a1 1 0 11-1.41 1.41l-.71-.71a1 1 0 010-1.41zm12.02 12.02a1 1 0 011.41 0l.71.71a1 1 0 11-1.41 1.41l-.71-.71a1 1 0 010-1.41zM18.36 5.64a1 1 0 010 1.41l-.71.71a1 1 0 11-1.41-1.41l.71-.71a1 1 0 011.41 0zM6.05 17.66a1 1 0 010 1.41l-.71.71a1 1 0 11-1.41-1.41l.71-.71a1 1 0 011.41 0z"/>
+          </svg>
+          <svg class="bnb-theme-icon--moon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M21.64 13a9 9 0 01-10.63-10.6 1 1 0 00-1.34-1.12A11 11 0 1022.75 14.3a1 1 0 00-1.11-1.3z"/>
+          </svg>
+        </button>
+        <div class="relative" id="admin-profile-wrap">
+          <button type="button" id="admin-profile-btn" class="bnb-btn bnb-btn--ghost" aria-haspopup="true" aria-expanded="false">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 12a4 4 0 100-8 4 4 0 000 8zm0 2c-4 0-7 2-7 4v1h14v-1c0-2-3-4-7-4z"/>
+            </svg>
+            <span class="hidden sm:inline">{{ user.full_name or user.email }}</span>
+          </button>
+          <div id="admin-profile-dropdown" class="hidden absolute right-0 mt-2 w-52 rounded-[12px] border border-[var(--bnb-line)] bg-[var(--bnb-surface)] py-2 shadow-xl z-50">
+            <a href="{{ url_for('dashboard_page') }}" class="block px-4 py-2 text-sm text-[var(--bnb-muted)] hover:text-[var(--bnb-cyan)]">Workspace</a>
+            <a href="{{ url_for('home') }}" class="block px-4 py-2 text-sm text-[var(--bnb-muted)] hover:text-[var(--bnb-cyan)]">Home</a>
+            <form id="adminLogoutForm" action="{{ url_for('auth.logout') }}" method="post">
+              <button type="submit" class="w-full text-left px-4 py-2 text-sm text-[var(--bnb-danger)]">Log out</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="bnb-admin-main">
+      <div id="tab-users" class="admin-tab">
+        <h2 class="bnb-admin-title gradient-text">Users</h2>
+        <div class="bnb-admin-toolbar">
+          <input type="text" id="search-users" placeholder="Search users by name or email...">
+          <button type="button" class="add-user-btn bnb-btn bnb-btn--primary">Add User</button>
+        </div>
+        <div class="bnb-admin-table-wrap glass-card">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Business</th>
+                <th>Role</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="users-table"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="tab-chatbots" class="admin-tab hidden">
+        <h2 class="bnb-admin-title gradient-text">Assistants</h2>
+        <div class="bnb-admin-toolbar">
+          <input type="text" id="search-chatbots" placeholder="Search assistants by name, owner, or business...">
+          <button type="button" class="add-chatbot-btn bnb-btn bnb-btn--primary">Add Assistant</button>
+        </div>
+        <div class="bnb-admin-table-wrap glass-card">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Owner</th>
+                <th>Business</th>
+                <th>Prompt</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="chatbots-table"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="tab-suggestions" class="admin-tab hidden">
+        <h2 class="bnb-admin-title gradient-text">Suggestions</h2>
+        <div class="bnb-admin-toolbar">
+          <input type="text" id="search-suggestions" placeholder="Search suggestions by chatbot or content...">
+          <button type="button" class="add-suggestion-btn bnb-btn bnb-btn--primary">Add Suggestion</button>
+        </div>
+        <div class="bnb-admin-table-wrap glass-card">
+          <table>
+            <thead>
+              <tr>
+                <th>Assistant</th>
+                <th>Owner</th>
+                <th>Suggestions</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="suggestions-table"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="tab-tenants" class="admin-tab hidden">
+        <h2 class="bnb-admin-title gradient-text">Businesses</h2>
+        <div class="bnb-admin-toolbar">
+          <input type="text" id="search-tenants" placeholder="Search businesses by name or owner...">
+          <button type="button" class="add-tenant-btn bnb-btn bnb-btn--primary">Add Business</button>
+        </div>
+        <div class="bnb-admin-table-wrap glass-card">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Owner</th>
+                <th>Settings</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="tenants-table"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="tab-documents" class="admin-tab hidden">
+        <h2 class="bnb-admin-title gradient-text">Documents</h2>
+        <div class="bnb-admin-toolbar">
+          <input type="text" id="search-documents" placeholder="Search documents by title, type, or owner...">
+          <button type="button" class="add-document-btn bnb-btn bnb-btn--primary">Add Document</button>
+        </div>
+        <div class="bnb-admin-table-wrap glass-card">
+          <table>
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Type</th>
+                <th>Owner</th>
+                <th>Uploaded</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="documents-table"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block extrajs %}
+<script src="{{ url_for('static', path='js/admin_panel.js') }}?v=20261022o"></script>
+<script>
+(function () {
+  var btn = document.getElementById('admin-profile-btn');
+  var menu = document.getElementById('admin-profile-dropdown');
+  if (btn && menu) {
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var open = menu.classList.toggle('hidden') === false;
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    document.addEventListener('click', function () {
+      menu.classList.add('hidden');
+      btn.setAttribute('aria-expanded', 'false');
+    });
+  }
+  var logout = document.getElementById('adminLogoutForm');
+  if (logout) {
+    logout.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      await fetch(logout.action, { method: 'POST', credentials: 'same-origin' });
+      window.location.href = '/';
+    });
+  }
+
+  var layout = document.getElementById('admin-layout');
+  var toggle = document.getElementById('admin-side-toggle');
+  var backdrop = document.getElementById('admin-side-backdrop');
+  function setSideOpen(open) {
+    if (!layout) return;
+    layout.classList.toggle('is-side-open', open);
+    if (toggle) {
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      toggle.setAttribute('aria-label', open ? 'Close admin menu' : 'Open admin menu');
+    }
+    if (backdrop) backdrop.hidden = !open;
+    document.body.classList.toggle('bnb-side-lock', open);
+  }
+  if (toggle) toggle.addEventListener('click', function () {
+    setSideOpen(!layout.classList.contains('is-side-open'));
+  });
+  if (backdrop) backdrop.addEventListener('click', function () { setSideOpen(false); });
+  document.querySelectorAll('.bnb-admin-side .sidebar-btn, .bnb-admin-side__link').forEach(function (el) {
+    el.addEventListener('click', function () {
+      if (window.matchMedia('(max-width: 900px)').matches) setSideOpen(false);
+    });
+  });
+  window.addEventListener('resize', function () {
+    if (window.matchMedia('(min-width: 901px)').matches) setSideOpen(false);
+  });
+
+  if (window.__bnbTheme && window.__bnbTheme.bind) window.__bnbTheme.bind();
+})();
+</script>
+{% endblock %}

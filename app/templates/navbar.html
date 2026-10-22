@@ -1,0 +1,141 @@
+<header class="bnb-nav">
+  <div class="bnb-nav__panel">
+  <div class="bnb-nav__inner">
+    <a href="{{ url_for('home') }}" class="bnb-brand" aria-label="ChatAI home">
+      <img src="{{ url_for('static', path='brand-mark.png') }}" alt="">
+      <span class="bnb-brand__name">BnB <span>ChatAI</span></span>
+    </a>
+
+    <nav class="bnb-nav__links" aria-label="Primary">
+      <a href="{{ url_for('home') }}">Home</a>
+      {% if user_authenticated %}
+      <a href="{{ url_for('dashboard_page') }}">Workspace</a>
+      {% if user and user.is_admin %}
+      <a href="{{ url_for('admin_panel') }}">Admin</a>
+      {% endif %}
+      {% else %}
+      <a href="{{ url_for('home') }}#how-it-works">How it works</a>
+      {% endif %}
+    </nav>
+
+    <div class="bnb-nav__actions">
+      <button type="button" class="bnb-btn bnb-btn--ghost bnb-theme-toggle" aria-label="Switch to light mode" title="Light mode" aria-pressed="false">
+        <svg class="bnb-theme-icon--sun" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M12 7a5 5 0 100 10 5 5 0 000-10zm0-5a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm0 17a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM3 11a1 1 0 100 2h1a1 1 0 100-2H3zm17 0a1 1 0 100 2h1a1 1 0 100-2h-1zM5.64 5.64a1 1 0 011.41 0l.71.71a1 1 0 11-1.41 1.41l-.71-.71a1 1 0 010-1.41zm12.02 12.02a1 1 0 011.41 0l.71.71a1 1 0 11-1.41 1.41l-.71-.71a1 1 0 010-1.41zM18.36 5.64a1 1 0 010 1.41l-.71.71a1 1 0 11-1.41-1.41l.71-.71a1 1 0 011.41 0zM6.05 17.66a1 1 0 010 1.41l-.71.71a1 1 0 11-1.41-1.41l.71-.71a1 1 0 011.41 0z"/>
+        </svg>
+        <svg class="bnb-theme-icon--moon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M21.64 13a9 9 0 01-10.63-10.6 1 1 0 00-1.34-1.12A11 11 0 1022.75 14.3a1 1 0 00-1.11-1.3z"/>
+        </svg>
+      </button>
+
+      {% if not user_authenticated %}
+      <a href="{{ url_for('login_page') }}" class="bnb-btn bnb-btn--ghost bnb-nav__desktop-only bnb-nav__cta">Sign in</a>
+      <a href="{{ url_for('signup_page') }}" class="bnb-btn bnb-btn--primary bnb-nav__desktop-only bnb-nav__cta">Get started</a>
+      {% else %}
+      <div class="relative bnb-nav__desktop-only" id="profile-wrap">
+        <button type="button" id="profile-menu-btn" class="bnb-btn bnb-btn--ghost" aria-haspopup="true" aria-expanded="false">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 12a4 4 0 100-8 4 4 0 000 8zm0 2c-4 0-7 2-7 4v1h14v-1c0-2-3-4-7-4z"/>
+          </svg>
+          <span class="bnb-nav__profile-name">{{ user.full_name or user.email }}</span>
+        </button>
+        <div id="profile-dropdown" class="hidden absolute right-0 mt-2 w-52 rounded-[12px] border border-[var(--bnb-line)] bg-[var(--bnb-surface)] py-2 shadow-xl z-50">
+          {% if user and user.is_admin %}
+          <a href="{{ url_for('admin_panel') }}" class="block px-4 py-2 text-sm text-[var(--bnb-muted)] hover:text-[var(--bnb-cyan)]">Admin panel</a>
+          {% endif %}
+          <a href="{{ url_for('dashboard_page') }}" class="block px-4 py-2 text-sm text-[var(--bnb-muted)] hover:text-[var(--bnb-cyan)]">Workspace</a>
+          <form id="logoutForm" action="{{ url_for('auth.logout') }}" method="post">
+            <button type="submit" class="w-full text-left px-4 py-2 text-sm text-[var(--bnb-danger)]">Log out</button>
+          </form>
+        </div>
+      </div>
+      {% endif %}
+
+      <button type="button" class="bnb-btn bnb-btn--ghost bnb-nav__menu-btn" id="mobile-menu-btn" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">
+        <svg class="bnb-nav__icon-open" width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <line x1="4" y1="7" x2="20" y2="7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <line x1="4" y1="12" x2="20" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <line x1="4" y1="17" x2="20" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <svg class="bnb-nav__icon-close" width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div id="mobile-menu" class="bnb-nav__mobile" hidden>
+    <nav class="bnb-nav__mobile-links" aria-label="Mobile">
+      <a href="{{ url_for('home') }}">Home</a>
+      {% if user_authenticated %}
+      <a href="{{ url_for('dashboard_page') }}">Workspace</a>
+      {% if user and user.is_admin %}
+      <a href="{{ url_for('admin_panel') }}">Admin</a>
+      {% endif %}
+      <form id="mobileLogoutForm" action="{{ url_for('auth.logout') }}" method="post">
+        <button type="submit" class="bnb-nav__mobile-logout">Log out</button>
+      </form>
+      {% else %}
+      <a href="{{ url_for('home') }}#how-it-works">How it works</a>
+      <a href="{{ url_for('login_page') }}">Sign in</a>
+      <a href="{{ url_for('signup_page') }}" class="bnb-btn bnb-btn--primary bnb-btn--block">Get started</a>
+      {% endif %}
+    </nav>
+  </div>
+  </div>
+</header>
+
+<script>
+(function () {
+  const profileBtn = document.getElementById('profile-menu-btn');
+  const profileDropdown = document.getElementById('profile-dropdown');
+  if (profileBtn && profileDropdown) {
+    profileBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      const open = profileDropdown.classList.toggle('hidden') === false;
+      profileBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    document.addEventListener('click', function () {
+      profileDropdown.classList.add('hidden');
+      profileBtn.setAttribute('aria-expanded', 'false');
+    });
+  }
+
+  const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+  const mobileMenu = document.getElementById('mobile-menu');
+  const nav = document.querySelector('.bnb-nav');
+
+  function setMobileOpen(open) {
+    if (!mobileMenu || !mobileMenuBtn) return;
+    mobileMenu.hidden = !open;
+    mobileMenuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    mobileMenuBtn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    if (nav) nav.classList.toggle('is-mobile-open', open);
+  }
+
+  if (mobileMenuBtn && mobileMenu) {
+    mobileMenuBtn.addEventListener('click', function () {
+      setMobileOpen(mobileMenu.hidden);
+    });
+    mobileMenu.querySelectorAll('a').forEach(function (link) {
+      link.addEventListener('click', function () { setMobileOpen(false); });
+    });
+    window.addEventListener('resize', function () {
+      if (window.matchMedia('(min-width: 768px)').matches) setMobileOpen(false);
+    });
+  }
+
+  async function doLogout(form) {
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      await fetch(form.action, { method: 'POST', credentials: 'same-origin' });
+      window.location.href = '/';
+    });
+  }
+  const logoutForm = document.getElementById('logoutForm');
+  if (logoutForm) doLogout(logoutForm);
+  const mobileLogoutForm = document.getElementById('mobileLogoutForm');
+  if (mobileLogoutForm) doLogout(mobileLogoutForm);
+})();
+</script>

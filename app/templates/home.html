@@ -1,0 +1,134 @@
+{% extends "skeleton.html" %}
+{% block title %}ChatAI{% endblock %}
+{% block content %}
+<section class="bnb-hero">
+  <div class="bnb-hero__media" aria-hidden="true">
+    <img src="{{ url_for('static', path='img/hero-support.jpg') }}" alt="" width="1800" height="1200">
+    <div class="bnb-hero__scrim"></div>
+  </div>
+  <div class="bnb-wrap">
+    <div class="bnb-hero__content">
+      <div class="bnb-hero__brand">
+        <img src="{{ url_for('static', path='brand-mark.png') }}" alt="">
+        ChatAI
+      </div>
+      <h1>Customer answers that live on <em>your</em> website</h1>
+      <p class="bnb-hero__lead">
+        Build a branded assistant, connect your documents, and embed it with one script.
+      </p>
+      <div class="bnb-hero__cta">
+        {% if user_authenticated %}
+        <a href="{{ url_for('dashboard_page') }}" class="bnb-btn bnb-btn--primary">Open workspace</a>
+        {% else %}
+        <a href="{{ url_for('signup_page') }}" class="bnb-btn bnb-btn--primary">Create account</a>
+        <a href="{{ url_for('login_page') }}" class="bnb-btn bnb-btn--ghost">Sign in</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="bnb-section" id="features">
+  <div class="bnb-wrap bnb-split">
+    <div>
+      <div class="bnb-section__head">
+        <h2>Built for support teams, not demos</h2>
+        <p>Keep each company isolated, publish clear prompts, and hand visitors answers grounded in your own files.</p>
+      </div>
+      <ul class="bnb-feature-list">
+        <li>
+          <span class="bnb-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M4 12h10M4 17h7"/><circle cx="18" cy="17" r="3"/></svg>
+          </span>
+          <div>
+            <h3>Separate workspaces</h3>
+            <p>Each business profile keeps its own assistants, styles, and documents.</p>
+          </div>
+        </li>
+        <li>
+          <span class="bnb-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 7h8v4H8zM6 17h12M9 17v-3h6v3"/></svg>
+          </span>
+          <div>
+            <h3>Document library</h3>
+            <p>Upload FAQs, product sheets, and policies your assistant can reference.</p>
+          </div>
+        </li>
+        <li>
+          <span class="bnb-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="5" width="16" height="14" rx="2"/><path d="M8 9h8M8 13h5"/></svg>
+          </span>
+          <div>
+            <h3>Embed on any site</h3>
+            <p>Drop in a small script and show a floating chat that matches your brand colors.</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <figure class="bnb-photo">
+      <img src="{{ url_for('static', path='img/team-desk.jpg') }}" alt="Team collaborating at a desk with laptops" width="1400" height="1050">
+    </figure>
+  </div>
+</section>
+
+<section class="bnb-section bnb-band" id="how-it-works">
+  <div class="bnb-wrap">
+    <div class="bnb-section__head">
+      <h2>Three steps to go live</h2>
+      <p>From signup to an assistant on your site in a single afternoon.</p>
+    </div>
+    <div class="bnb-steps">
+      <article class="bnb-step">
+        <span class="bnb-step__num">01</span>
+        <h3>Set up the business</h3>
+        <p>Create a profile, invite your team, and define how the assistant should sound.</p>
+      </article>
+      <article class="bnb-step">
+        <span class="bnb-step__num">02</span>
+        <h3>Add knowledge</h3>
+        <p>Attach FAQs and product docs so replies stay specific to your operation.</p>
+      </article>
+      <article class="bnb-step">
+        <span class="bnb-step__num">03</span>
+        <h3>Embed &amp; monitor</h3>
+        <p>Paste the widget snippet, then manage assistants from the workspace or admin panel.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="bnb-section">
+  <div class="bnb-wrap bnb-split">
+    <figure class="bnb-photo">
+      <img src="{{ url_for('static', path='img/admin-ops.jpg') }}" alt="Laptop showing analytics and operations dashboard" width="1400" height="997">
+    </figure>
+    <div>
+      <div class="bnb-section__head">
+        <h2>Admin control when you need it</h2>
+        <p>Platform admins can review users, tenants, and assistants from one panel — useful for agencies and internal ops.</p>
+      </div>
+      {% if user_authenticated and user and user.is_admin %}
+      <a href="{{ url_for('admin_panel') }}" class="bnb-btn bnb-btn--primary">Open admin</a>
+      {% elif not user_authenticated %}
+      <a href="{{ url_for('login_page') }}" class="bnb-btn bnb-btn--ghost">Sign in</a>
+      {% else %}
+      <a href="{{ url_for('dashboard_page') }}" class="bnb-btn bnb-btn--primary">Go to workspace</a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<section class="bnb-section bnb-band">
+  <div class="bnb-wrap bnb-cta-panel">
+    <div>
+      <h2>Ready to put ChatAI on your site?</h2>
+      <p>Create a workspace and embed your first assistant in minutes.</p>
+    </div>
+    {% if user_authenticated %}
+    <a href="{{ url_for('dashboard_page') }}" class="bnb-btn bnb-btn--primary">Open workspace</a>
+    {% else %}
+    <a href="{{ url_for('signup_page') }}" class="bnb-btn bnb-btn--primary">Get started</a>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
